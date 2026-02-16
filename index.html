@@ -133,14 +133,27 @@
         }
 
         document.getElementById("btn-generate").addEventListener("click", () => {
+            // DEBUG: Show an alert to prove the button was clicked
+            alert("Button Clicked! Preparing data...");
+
             const data = {
                 model: document.getElementById("model").value,
                 ratio: document.getElementById("ratio").value,
                 mode: selectedMode,
                 prompt: document.getElementById("prompt").value
             };
-            tg.sendData(JSON.stringify(data)); 
+            
+            // DEBUG: Show the data we are about to send
+            alert("Sending: " + JSON.stringify(data));
+
+            try {
+                tg.sendData(JSON.stringify(data));
+                // If the window closes after this, the frontend is working!
+            } catch (e) {
+                alert("Error sending data: " + e);
+            }
         });
     </script>
 </body>
 </html>
+
