@@ -6,73 +6,20 @@
     <title>ChasGen</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            background-color: #1c1c1e;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        label { font-size: 12px; color: #8e8e93; margin-bottom: 5px; display: block; font-weight: bold; }
-        
-        select, textarea {
-            width: 100%;
-            padding: 12px;
-            background-color: #2c2c2e;
-            border: 1px solid #3a3a3c;
-            border-radius: 10px;
-            color: white;
-            box-sizing: border-box;
-            font-size: 16px;
-            outline: none;
-        }
-        
+        body { background-color: #1c1c1e; color: #ffffff; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        label { font-size: 12px; color: #8e8e93; font-weight: bold; margin-bottom: 5px; display: block; }
+        select, textarea { width: 100%; padding: 12px; background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 10px; color: white; font-size: 16px; box-sizing: border-box; outline: none; }
         select:focus, textarea:focus { border-color: #34c759; }
-
-        /* Custom Radio Buttons for Mode */
         .mode-container { display: flex; gap: 10px; }
-        .mode-option {
-            flex: 1;
-            padding: 12px;
-            background: #2c2c2e;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            border: 1px solid #3a3a3c;
-            font-size: 14px;
-        }
-        .mode-option.active {
-            background: #34c759;
-            color: black;
-            border-color: #34c759;
-            font-weight: bold;
-        }
-        .mode-option.nsfw.active {
-            background: #ff3b30; /* Red for NSFW */
-            border-color: #ff3b30;
-        }
-
-        #btn-generate {
-            margin-top: 10px;
-            background-color: #34c759;
-            color: #000;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
+        .mode-option { flex: 1; padding: 12px; background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 10px; text-align: center; cursor: pointer; }
+        .mode-option.active { background: #34c759; color: black; font-weight: bold; border-color: #34c759; }
+        .mode-option.nsfw.active { background: #ff3b30; border-color: #ff3b30; }
+        #btn-generate { margin-top: 10px; background: #34c759; color: black; border: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div>
-        <label>CHOOSE MODEL</label>
+        <label>MODEL</label>
         <select id="model">
             <option value="Mira Filzah">Mira Filzah</option>
             <option value="Siti Khadijah Halim">Siti Khadijah Halim</option>
@@ -88,9 +35,8 @@
             <option value="None">No Model (Raw)</option>
         </select>
     </div>
-
     <div>
-        <label>ASPECT RATIO</label>
+        <label>SIZE</label>
         <select id="ratio">
             <option value="960x1280">📱 Portrait (3:4)</option>
             <option value="1280x960">🖥️ Landscape (4:3)</option>
@@ -98,7 +44,6 @@
             <option value="720x1280">📱 Tall (9:16)</option>
         </select>
     </div>
-
     <div>
         <label>MODE</label>
         <div class="mode-container">
@@ -106,54 +51,32 @@
             <div class="mode-option" id="mode-nsfw" onclick="selectMode('nsfw')">🔞 NSFW</div>
         </div>
     </div>
-
     <div>
         <label>PROMPT</label>
-        <textarea id="prompt" rows="4" placeholder="Describe your image here..."></textarea>
+        <textarea id="prompt" rows="3" placeholder="Describe it..."></textarea>
     </div>
-
-    <button id="btn-generate">GENERATE IMAGE</button>
+    <button id="btn-generate">GENERATE</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
         let selectedMode = 'normal';
-
         function selectMode(mode) {
             selectedMode = mode;
             document.getElementById('mode-normal').classList.remove('active');
             document.getElementById('mode-nsfw').classList.remove('active', 'nsfw');
-            
-            if (mode === 'normal') {
-                document.getElementById('mode-normal').classList.add('active');
-            } else {
-                document.getElementById('mode-nsfw').classList.add('active', 'nsfw');
-            }
+            if (mode === 'normal') document.getElementById('mode-normal').classList.add('active');
+            else document.getElementById('mode-nsfw').classList.add('active', 'nsfw');
         }
-
         document.getElementById("btn-generate").addEventListener("click", () => {
-            // DEBUG: Show an alert to prove the button was clicked
-            alert("Button Clicked! Preparing data...");
-
             const data = {
                 model: document.getElementById("model").value,
                 ratio: document.getElementById("ratio").value,
                 mode: selectedMode,
                 prompt: document.getElementById("prompt").value
             };
-            
-            // DEBUG: Show the data we are about to send
-            alert("Sending: " + JSON.stringify(data));
-
-            try {
-                tg.sendData(JSON.stringify(data));
-                // If the window closes after this, the frontend is working!
-            } catch (e) {
-                alert("Error sending data: " + e);
-            }
+            tg.sendData(JSON.stringify(data));
         });
     </script>
 </body>
 </html>
-
