@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Z-Image Generator</title>
+    <title>ChasGen</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            background-color: #1c1c1e; /* Dark background */
+            background-color: #1c1c1e;
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             padding: 20px;
@@ -15,82 +15,130 @@
             flex-direction: column;
             gap: 15px;
         }
+
+        label { font-size: 12px; color: #8e8e93; margin-bottom: 5px; display: block; font-weight: bold; }
         
-        /* Input Fields */
-        label { font-size: 12px; color: #8e8e93; margin-bottom: 5px; display: block; }
-        input[type="text"], select {
+        select, textarea {
             width: 100%;
             padding: 12px;
             background-color: #2c2c2e;
             border: 1px solid #3a3a3c;
-            border-radius: 8px;
+            border-radius: 10px;
             color: white;
-            box-sizing: border-box; /* Fixes padding issues */
+            box-sizing: border-box;
             font-size: 16px;
+            outline: none;
+        }
+        
+        select:focus, textarea:focus { border-color: #34c759; }
+
+        /* Custom Radio Buttons for Mode */
+        .mode-container { display: flex; gap: 10px; }
+        .mode-option {
+            flex: 1;
+            padding: 12px;
+            background: #2c2c2e;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #3a3a3c;
+            font-size: 14px;
+        }
+        .mode-option.active {
+            background: #34c759;
+            color: black;
+            border-color: #34c759;
+            font-weight: bold;
+        }
+        .mode-option.nsfw.active {
+            background: #ff3b30; /* Red for NSFW */
+            border-color: #ff3b30;
         }
 
-        /* Sliders */
-        .slider-container { background: #2c2c2e; padding: 15px; border-radius: 8px; }
-        input[type="range"] { width: 100%; accent-color: #34c759; } /* Lime green accent */
-        
-        /* Main Button */
         #btn-generate {
             margin-top: 10px;
-            background-color: #34c759; /* Green like RunPod/Nvidia */
+            background-color: #34c759;
             color: #000;
             border: none;
-            padding: 15px;
+            padding: 16px;
             border-radius: 12px;
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
             width: 100%;
         }
-        #btn-generate:active { opacity: 0.8; }
     </style>
 </head>
 <body>
 
     <div>
-        <label>PROMPT</label>
-        <input type="text" id="prompt" placeholder="A futuristic cyberpunk city..." />
+        <label>CHOOSE MODEL</label>
+        <select id="model">
+            <option value="Mira Filzah">Mira Filzah</option>
+            <option value="Siti Khadijah Halim">Siti Khadijah Halim</option>
+            <option value="Ahirine Ahirudin">Ahirine Ahirudin</option>
+            <option value="Fazriena">Fazriena</option>
+            <option value="Nurul Syazwani">Nurul Syazwani</option>
+            <option value="Daiyan Trisha">Daiyan Trisha</option>
+            <option value="Elizabeth Tan">Elizabeth Tan</option>
+            <option value="Amelia Henderson">Amelia Henderson</option>
+            <option value="Iman Troye">Iman Troye</option>
+            <option value="Intan Serah">Intan Serah</option>
+            <option value="Yazmin Aziz">Yazmin Aziz</option>
+            <option value="None">No Model (Raw)</option>
+        </select>
     </div>
 
     <div>
         <label>ASPECT RATIO</label>
         <select id="ratio">
-            <option value="1024x1024">Square (1:1)</option>
-            <option value="896x1152">Portrait (9:16 approx)</option>
-            <option value="1152x896">Landscape (16:9 approx)</option>
+            <option value="960x1280">📱 Portrait (3:4)</option>
+            <option value="1280x960">🖥️ Landscape (4:3)</option>
+            <option value="1024x1024">⬜ Square (1:1)</option>
+            <option value="720x1280">📱 Tall (9:16)</option>
         </select>
     </div>
 
-    <div class="slider-container">
-        <label>CREATIVITY (CFG): <span id="cfg-val">3.5</span></label>
-        <input type="range" id="cfg" min="1" max="7" step="0.5" value="3.5" oninput="document.getElementById('cfg-val').innerText = this.value">
+    <div>
+        <label>MODE</label>
+        <div class="mode-container">
+            <div class="mode-option active" id="mode-normal" onclick="selectMode('normal')">🟢 Normal</div>
+            <div class="mode-option" id="mode-nsfw" onclick="selectMode('nsfw')">🔞 NSFW</div>
+        </div>
     </div>
 
-    <div class="slider-container">
-        <label>QUALITY (STEPS): <span id="steps-val">28</span></label>
-        <input type="range" id="steps" min="20" max="50" step="1" value="28" oninput="document.getElementById('steps-val').innerText = this.value">
+    <div>
+        <label>PROMPT</label>
+        <textarea id="prompt" rows="4" placeholder="Describe your image here..."></textarea>
     </div>
 
-    <button id="btn-generate">GENERATE</button>
+    <button id="btn-generate">GENERATE IMAGE</button>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Expands the app to full height
+        tg.expand();
+
+        let selectedMode = 'normal';
+
+        function selectMode(mode) {
+            selectedMode = mode;
+            document.getElementById('mode-normal').classList.remove('active');
+            document.getElementById('mode-nsfw').classList.remove('active', 'nsfw');
+            
+            if (mode === 'normal') {
+                document.getElementById('mode-normal').classList.add('active');
+            } else {
+                document.getElementById('mode-nsfw').classList.add('active', 'nsfw');
+            }
+        }
 
         document.getElementById("btn-generate").addEventListener("click", () => {
             const data = {
-                prompt: document.getElementById("prompt").value,
+                model: document.getElementById("model").value,
                 ratio: document.getElementById("ratio").value,
-                cfg: document.getElementById("cfg").value,
-                steps: document.getElementById("steps").value,
-                action: "generate_zimage" // Tag so your bot knows what to do
+                mode: selectedMode,
+                prompt: document.getElementById("prompt").value
             };
-
-            // Send data back to Telegram
             tg.sendData(JSON.stringify(data)); 
         });
     </script>
