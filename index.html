@@ -3,117 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ChasGenAI</title>
+    <title>ChasGen Studio</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #09090B;
-            --bg-card: #18181B;
-            --border: #27272A;
-            --text-primary: #FFFFFF;
-            --text-secondary: #A1A1AA;
-            --primary-orange: #FF5C00;
-            --glow-orange: rgba(255, 92, 0, 0.4);
+            /* Colors mapped from your palette & reference image */
+            --bg-main: #1d2428;         /* Primary Background (Dark) */
+            --bg-card: #14181b;         /* Secondary Background (Dark) */
+            --border: #262d34;          /* Alternate (Dark) */
+            --text-primary: #ffffff;    /* Primary Text */
+            --text-secondary: #95a1ac;  /* Secondary Text */
+            --primary-orange: #fa5421;  /* Primary Brand Color */
+            --glow-color: rgba(250, 84, 33, 0.25);
         }
 
         body {
-            background-color: var(--bg-main);
+            background-color: #050505; /* Deep black base */
+            background-image: radial-gradient(circle at 50% 0%, var(--glow-color) 0%, transparent 50%);
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 24px;
             padding-bottom: 40px;
+            min-height: 100vh;
+        }
+
+        /* The Glowing Logo Icon */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fa5421, #ee8b60);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 0 50px var(--glow-color), inset 0 2px 5px rgba(255,255,255,0.3);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .header h1 {
-            font-size: 28px;
-            font-weight: 800;
-            margin: 0 0 5px 0;
-            letter-spacing: 0.5px;
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
         }
 
-        .text-white {
-            color: #FFFFFF;
-        }
-
-        .text-orange {
-            color: var(--primary-orange);
-            text-shadow: 0 0 12px var(--glow-orange);
+        .header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .input-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
+        /* Pill-shaped inputs mimicking the Whop UI */
         textarea, select {
             width: 100%;
             background-color: var(--bg-card);
             color: var(--text-primary);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 24px; /* Pill shape */
+            padding: 16px 20px;
             font-size: 15px;
             font-family: 'Inter', sans-serif;
             box-sizing: border-box;
             outline: none;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            appearance: none; /* Removes default dropdown arrow to look cleaner */
+        }
+
+        textarea {
+            border-radius: 16px; /* Slightly less rounded for text area */
+            resize: none;
         }
 
         textarea:focus, select:focus {
             border-color: var(--primary-orange);
+            box-shadow: 0 0 0 4px rgba(250, 84, 33, 0.1);
         }
 
-        /* Choice Chips for Ratio & Batch Size */
+        /* Hidden standard radio buttons */
+        .chip-container input[type="radio"] {
+            display: none;
+        }
+
+        /* Chip layout */
         .chip-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
         }
 
         .chip-container.three-cols {
             grid-template-columns: 1fr 1fr 1fr;
         }
 
-        .chip-container input[type="radio"] {
-            display: none;
-        }
-
+        /* Unselected chip state */
         .chip-container label {
-            background-color: var(--bg-card);
+            background-color: transparent;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 5px;
+            border-radius: 20px; /* Pill shape */
+            padding: 14px 5px;
             text-align: center;
             color: var(--text-secondary);
             font-weight: 500;
             font-size: 14px;
             cursor: pointer;
-            text-transform: none;
             transition: all 0.2s ease;
             margin: 0;
         }
 
+        /* Selected chip state */
         .chip-container input[type="radio"]:checked + label {
-            background-color: rgba(255, 92, 0, 0.1);
-            border-color: var(--primary-orange);
-            color: var(--primary-orange);
-            box-shadow: 0 0 10px var(--glow-orange);
+            background-color: var(--bg-card);
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        /* Label for sections */
+        .section-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: block;
+            padding-left: 4px;
         }
 
         /* Toggle Switch for NSFW */
@@ -121,22 +150,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--bg-card);
-            padding: 14px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            background-color: transparent;
+            padding: 8px 4px;
         }
 
         .toggle-row label {
             margin: 0;
-            color: var(--text-primary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 15px;
         }
 
         .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 28px;
+            width: 52px;
+            height: 30px;
         }
 
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -145,7 +174,8 @@
             position: absolute;
             cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--border);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
             transition: .4s;
             border-radius: 34px;
         }
@@ -153,57 +183,62 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px; width: 20px;
-            left: 4px; bottom: 4px;
-            background-color: white;
+            height: 22px; width: 22px;
+            left: 3px; bottom: 3px;
+            background-color: var(--text-secondary);
             transition: .4s;
             border-radius: 50%;
         }
 
         input:checked + .slider {
             background-color: var(--primary-orange);
-            box-shadow: 0 0 12px var(--glow-orange);
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 12px var(--glow-color);
         }
 
         input:checked + .slider:before {
+            background-color: #ffffff;
             transform: translateX(22px);
         }
 
-        /* Generate Button */
+        /* Primary Call to Action Button (Like Whop's "Sign Up") */
         .generate-btn {
-            background: linear-gradient(135deg, #FF5C00, #E65300);
-            color: white;
+            background: #ffffff;
+            color: #000000;
             border: none;
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             font-size: 16px;
-            font-weight: 700;
-            border-radius: 12px;
-            margin-top: 10px;
+            font-weight: 600;
+            border-radius: 30px; /* Fully rounded pill */
+            margin-top: 20px;
             cursor: pointer;
-            box-shadow: 0 4px 20px var(--glow-orange);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
         .generate-btn:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 10px var(--glow-orange);
+            transform: scale(0.97);
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
+    <div class="logo-container">
+        <div class="logo-box">🪄</div>
+    </div>
+
     <div class="header">
-        <h1><span class="text-white">ChasGen</span><span class="text-orange">AI</span></h1>
+        <h1>ChasGen Studio</h1>
+        <p>Your destination for creating AI imagery.</p>
     </div>
 
     <div class="input-group">
-        <label>Your Prompt</label>
-        <textarea id="prompt" rows="3" placeholder="Describe the image you want to generate..."></textarea>
+        <textarea id="prompt" rows="3" placeholder="What do you want to generate?"></textarea>
     </div>
 
     <div class="input-group">
-        <label>Select Model</label>
+        <span class="section-label">Select Model</span>
         <select id="model">
             <optgroup label="✨ Free Models">
                 <option value="Mira Filzah">Mira Filzah</option>
@@ -220,27 +255,27 @@
     </div>
 
     <div class="input-group">
-        <label>Aspect Ratio</label>
+        <span class="section-label">Aspect Ratio</span>
         <div class="chip-container">
             <input type="radio" id="ratio-golden" name="ratio" value="golden" checked>
             <label for="ratio-golden">🌟 Golden (3:4)</label>
 
             <input type="radio" id="ratio-portrait" name="ratio" value="portrait">
-            <label for="ratio-portrait">📱 Portrait (9:16)</label>
+            <label for="ratio-portrait">📱 Portrait</label>
 
             <input type="radio" id="ratio-landscape" name="ratio" value="landscape">
             <label for="ratio-landscape">🖥️ Landscape</label>
 
             <input type="radio" id="ratio-square" name="ratio" value="square">
-            <label for="ratio-square">⬜ Square (1:1)</label>
+            <label for="ratio-square">⬜ Square</label>
         </div>
     </div>
 
     <div class="input-group">
-        <label>Batch Size (Images per Gen)</label>
+        <span class="section-label">Batch Size</span>
         <div class="chip-container three-cols">
             <input type="radio" id="batch-1" name="batch" value="1">
-            <label for="batch-1">1</label>
+            <label for="batch-1">1 Image</label>
 
             <input type="radio" id="batch-2" name="batch" value="2" checked>
             <label for="batch-2">2 (Free)</label>
@@ -252,7 +287,7 @@
 
     <div class="input-group">
         <div class="toggle-row">
-            <label for="nsfw-toggle">🔞 Enhance (NSFW Workflow)</label>
+            <label for="nsfw-toggle">Enhance (NSFW Workflow)</label>
             <label class="switch">
                 <input type="checkbox" id="nsfw-toggle">
                 <span class="slider"></span>
@@ -260,12 +295,12 @@
         </div>
     </div>
 
-    <button class="generate-btn" id="generateBtn">🪄 Generate Image</button>
+    <button class="generate-btn" id="generateBtn">Generate Image</button>
 
     <script>
         // Initialize Telegram Web App
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Make it full height
+        tg.expand(); 
 
         document.getElementById('generateBtn').addEventListener('click', function() {
             const promptInput = document.getElementById('prompt').value.trim();
